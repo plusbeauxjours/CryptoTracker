@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { Routes, Route, useLocation, useParams, useMatch } from "react-router";
 import { Link } from "react-router-dom";
@@ -201,7 +200,7 @@ const Coin: React.FC = () => {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart />
+              <Chart coinId={coinId} />
             </Route>
           </Routes>
         </>
