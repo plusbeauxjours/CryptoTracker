@@ -1,5 +1,12 @@
 import { useQuery } from "react-query";
-import { Routes, Route, useLocation, useParams, useMatch } from "react-router";
+import {
+  Switch,
+  Route,
+  useLocation,
+  useParams,
+  useRouteMatch,
+} from "react-router";
+import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
@@ -78,7 +85,7 @@ const Tab = styled.span<{ isActive: boolean }>`
 `;
 
 interface RouteParams {
-  coinId?: string;
+  coinId: string;
 }
 interface RouteState {
   name: string;
@@ -138,11 +145,10 @@ interface PriceData {
 }
 
 const Coin: React.FC = () => {
-  const priceMatch = useMatch("/:coinId/price");
-  const chartMatch = useMatch("/:coinId/chart");
-  const location = useLocation();
-  const name = location.state as RouteState;
-  const { coinId = "" } = useParams() as RouteParams;
+  const priceMatch = useRouteMatch("/:coinIdprice");
+  const chartMatch = useRouteMatch("/:coinId/chart");
+  const { coinId } = useParams<RouteParams>();
+  const { state } = useLocation<RouteState>();
 
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["infoData", coinId],
@@ -150,13 +156,19 @@ const Coin: React.FC = () => {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
     ["tickers", coinId],
-    () => fetchCoinTickers(coinId)
+    () => fetchCoinTickers(coinId),
+    { refetchInterval: 5000 }
   );
   const loading = infoLoading || tickersLoading;
 
   return (
     <Container>
-      <Header>{name ?? loading ? "Loading..." : infoData?.name}</Header>
+      <Helmet>
+        <title>
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
+        </title>
+      </Helmet>
+      <Header>{state?.name ?? loading ? "Loading..." : infoData?.name}</Header>
       {loading ? (
         <Loader>Loading...</Loader>
       ) : (
@@ -171,8 +183,8 @@ const Coin: React.FC = () => {
               <span>${infoData?.symbol}</span>
             </OverviewItem>
             <OverviewItem>
-              <span>Open Source:</span>
-              <span>{infoData?.open_source ? "Yes" : "No"}</span>
+              <span>Price:</span>
+              <span>${tickersData?.quotes.USD.price.toFixed(3)}</span>
             </OverviewItem>
           </Overview>
           <Description>{infoData?.description}</Description>
@@ -194,15 +206,14 @@ const Coin: React.FC = () => {
               <Link to={`/${coinId}/price`}>Price</Link>
             </Tab>
           </Tabs>
-
-          <Routes>
+          <Switch>
             <Route path={`/:coinId/price`}>
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
               <Chart coinId={coinId} />
             </Route>
-          </Routes>
+          </Switch>
         </>
       )}
     </Container>
