@@ -144,7 +144,11 @@ interface PriceData {
   };
 }
 
-const Coin: React.FC = () => {
+interface ICoinProps {
+  isDark: boolean;
+}
+
+function Coin({ isDark }: ICoinProps) {
   const priceMatch = useRouteMatch("/:coinIdprice");
   const chartMatch = useRouteMatch("/:coinId/chart");
   const { coinId } = useParams<RouteParams>();
@@ -211,13 +215,13 @@ const Coin: React.FC = () => {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart coinId={coinId} />
+              <Chart isDark={isDark} coinId={coinId} />
             </Route>
           </Switch>
         </>
       )}
     </Container>
   );
-};
+}
 
 export default Coin;
