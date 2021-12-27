@@ -9,10 +9,13 @@ import {
 import { Helmet } from "react-helmet";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { useRecoilValue } from "recoil";
+
 import { fetchCoinInfo, fetchCoinTickers } from "../api";
 
 import Chart from "./Chart";
 import Price from "./Price";
+import { isDarkAtom } from "../atoms";
 
 const Title = styled.h1`
   font-size: 48px;
@@ -144,15 +147,15 @@ interface PriceData {
   };
 }
 
-interface ICoinProps {
-  isDarkMode: boolean;
-}
+interface ICoinProps {}
 
-function Coin({ isDarkMode }: ICoinProps) {
+function Coin({}: ICoinProps) {
   const priceMatch = useRouteMatch("/:coinIdprice");
   const chartMatch = useRouteMatch("/:coinId/chart");
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
+
+  const isDarkMode = useRecoilValue(isDarkAtom);
 
   const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
     ["infoData", coinId],

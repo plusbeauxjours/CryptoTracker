@@ -3,6 +3,8 @@ import Router from "./Router";
 import { ReactQueryDevtools } from "react-query/devtools";
 import { darkTheme, lightTheme } from "./theme";
 import { useState } from "react";
+import { useRecoilValue } from "recoil";
+import { isDarkAtom } from "./atoms";
 
 const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400&display=swap');
@@ -70,15 +72,12 @@ a {
 `;
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const toggleDarkMode = () => setIsDarkMode((current) => !current);
-
+  const isDarkMode = useRecoilValue(isDarkAtom);
   return (
     <>
       <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-        <button onClick={toggleDarkMode}>Toggle Mode</button>
         <GlobalStyle />
-        <Router isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
+        <Router />
         <ReactQueryDevtools initialIsOpen={true} />
       </ThemeProvider>
     </>
